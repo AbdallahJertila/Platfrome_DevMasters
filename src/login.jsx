@@ -11,10 +11,31 @@ class Login extends Component {
         };
     }
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault();
-        // Ajoute ici le traitement pour soumettre les données
-        this.setState({ identifiant: '', password: '' }); // Exemple de reset
+        const { identifiant, password } = this.state;
+
+        try {
+            // Envoi des données du formulaire à PHP via une requête POST
+            const response = await fetch('login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `identifiant=${identifiant}&password=${password}`
+            });
+
+            const data = await response.json();
+
+            // Si l'authentification réussie
+            if (data.success) {
+                window.location.href = 'bienvenue.php'; // Rediriger l'utilisateur
+            } else {
+                this.setState({ errorMessage: data.message }); // Afficher le message d'erreur
+            }
+        } catch (error) {
+            console.error("Erreur:", error);
+        }
     };
     handleChange = (e) => {
         const { name, value } = e.target;
